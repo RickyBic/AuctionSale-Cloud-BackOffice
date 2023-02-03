@@ -1,14 +1,14 @@
 import * as UT from "./userTypes";
 import axios from "axios";
 
-const REGISTER_URL = "http://localhost:8080/user/register";
+const REGISTER_URL = "https://auctionsale-cloud-webservice-production.up.railway.app/user/register";
 
 export const fetchUsers = () => {
   return (dispatch) => {
     dispatch(userRequest());
     axios
       .get(
-        "http://localhost:8080/user"
+        "https://auctionsale-cloud-webservice-production.up.railway.app/user"
       )
       .then((response) => {
         dispatch(userSuccess(response.data));

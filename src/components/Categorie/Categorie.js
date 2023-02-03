@@ -53,7 +53,7 @@ class Categorie extends Component {
     currentPage -= 1;
     axios
       .get(
-        "http://localhost:8080/categories?pageNumber=" +
+        "https://auctionsale-cloud-webservice-production.up.railway.app/categories?pageNumber=" +
           currentPage +
           "&pageSize=" +
           this.state.categoriesPerPage +

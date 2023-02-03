@@ -51,7 +51,7 @@ class EnchereList extends Component {
     currentPage -= 1;
     axios
       .get(
-        "http://localhost:8080/encheres?pageNumber=" +
+        "https://auctionsale-cloud-webservice-production.up.railway.app/encheres?pageNumber=" +
           currentPage +
           "&pageSize=" +
           this.state.encheresPerPage +
@@ -149,7 +149,7 @@ class EnchereList extends Component {
     currentPage -= 1;
     axios
       .get(
-        "http://localhost:8080/encheres/search/" +
+        "https://auctionsale-cloud-webservice-production.up.railway.app/encheres/search/" +
           this.state.search +
           "?page=" +
           currentPage +

@@ -7,7 +7,7 @@ export const saveCategorie = (categorie) => {
       type: CT.SAVE_CATEGORIE_REQUEST,
     });
     axios
-      .post("http://localhost:8080/categories", categorie)
+      .post("https://auctionsale-cloud-webservice-production.up.railway.app/categories", categorie)
       .then((response) => {
         dispatch(categorieSuccess(response.data));
       })
@@ -23,7 +23,7 @@ export const deleteCategorie = (categorieId) => {
       type: CT.DELETE_CATEGORIE_REQUEST,
     });
     axios
-      .delete("http://localhost:8080/categories/" + categorieId)
+      .delete("https://auctionsale-cloud-webservice-production.up.railway.app/categories/" + categorieId)
       .then((response) => {
         dispatch(categorieSuccess(response.data));
       })

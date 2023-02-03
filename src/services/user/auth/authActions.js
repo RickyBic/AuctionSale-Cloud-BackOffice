@@ -1,7 +1,7 @@
 import * as AT from "./authTypes";
 import axios from "axios";
 
-const AUTH_URL = "http://localhost:8080/user/authenticate";
+const AUTH_URL = "https://auctionsale-cloud-webservice-production.up.railway.app/user/authenticate";
 
 export const authenticateUser = (email, password) => async (dispatch) => {
   dispatch(loginRequest());
