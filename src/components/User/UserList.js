@@ -95,7 +95,7 @@ class UserList extends Component {
         ) : (
           <Card className={"border border-dark bg-dark text-white"}>
             <Card.Header>
-              <FontAwesomeIcon icon={faUsers} /> User List
+              <FontAwesomeIcon icon={faUsers} />
             </Card.Header>
             <Card.Body>
               <Table bordered hover striped variant="dark">
@@ -103,26 +103,24 @@ class UserList extends Component {
                   <tr>
                     <td>Name</td>
                     <td>Email</td>
-                    <td>Address</td>
-                    <td>Created</td>
-                    <td>Balance</td>
+                    <td>Mobile</td>
+                    <td>Solde compte</td>
+                    <td>Role</td>
                   </tr>
                 </thead>
                 <tbody>
                   {users.length === 0 ? (
                     <tr align="center">
-                      <td colSpan="6">No Users Available</td>
+                      <td colSpan="6">Aucuns utilisateurs.</td>
                     </tr>
                   ) : (
                     currentUsers.map((user, index) => (
                       <tr key={index}>
-                        <td>
-                          {user.first} {user.last}
-                        </td>
+                        <td>{user.name}</td>
                         <td>{user.email}</td>
-                        <td>{user.address}</td>
-                        <td>{user.created}</td>
-                        <td>{user.balance}</td>
+                        <td>{user.mobile}</td>
+                        <td>{user.soldecompte} Ar</td>
+                        <td>{user.role.name}</td>
                       </tr>
                     ))
                   )}
@@ -131,9 +129,6 @@ class UserList extends Component {
             </Card.Body>
             {users.length > 0 ? (
               <Card.Footer>
-                <div style={{ float: "left" }}>
-                  Showing Page {currentPage} of {totalPages}
-                </div>
                 <div style={{ float: "right" }}>
                   <InputGroup size="sm">
                     <InputGroup.Prepend>

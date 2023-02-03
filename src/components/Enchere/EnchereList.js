@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 
 import { connect } from "react-redux";
-import { deleteCategorie } from "../../services/index";
 
 import "./../../assets/css/Style.css";
 import {
   Card,
   Table,
-  ButtonGroup,
   Button,
   InputGroup,
   FormControl,
@@ -15,8 +13,6 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faList,
-  faEdit,
-  faTrash,
   faStepBackward,
   faFastBackward,
   faStepForward,
@@ -24,18 +20,16 @@ import {
   faSearch,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
-import MyToast from "../MyToast";
 import axios from "axios";
 
-class CategorieList extends Component {
+class EnchereList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      categories: [],
+      encheres: [],
       search: "",
       currentPage: 1,
-      categoriesPerPage: 5,
+      encheresPerPage: 5,
       sortDir: "asc",
     };
   }
@@ -45,29 +39,29 @@ class CategorieList extends Component {
       this.state.sortDir === "asc"
         ? this.setState({ sortDir: "desc" })
         : this.setState({ sortDir: "asc" });
-      this.findAllCategories(this.state.currentPage);
+      this.findAllEncheres(this.state.currentPage);
     }, 500);
   };
 
   componentDidMount() {
-    this.findAllCategories(this.state.currentPage);
+    this.findAllEncheres(this.state.currentPage);
   }
 
-  findAllCategories(currentPage) {
+  findAllEncheres(currentPage) {
     currentPage -= 1;
     axios
       .get(
-        "https://auctionsale-cloud-webservice-production.up.railway.app/categories?pageNumber=" +
+        "http://localhost:8080/encheres?pageNumber=" +
           currentPage +
           "&pageSize=" +
-          this.state.categoriesPerPage +
-          "&sortBy=name&sortDir=" +
+          this.state.encheresPerPage +
+          "&sortBy=prixdepart&sortDir=" +
           this.state.sortDir
       )
       .then((response) => response.data)
       .then((data) => {
         this.setState({
-          categories: data.content,
+          encheres: data.content,
           totalPages: data.totalPages,
           totalElements: data.totalElements,
           currentPage: data.number + 1,
@@ -80,25 +74,12 @@ class CategorieList extends Component {
       });
   }
 
-  deleteCategorie = (categorieId) => {
-    this.props.deleteCategorie(categorieId);
-    setTimeout(() => {
-      if (this.props.categorieObject != null) {
-        this.setState({ show: true });
-        setTimeout(() => this.setState({ show: false }), 3000);
-        this.findAllCategories(this.state.currentPage);
-      } else {
-        this.setState({ show: false });
-      }
-    }, 1000);
-  };
-
   changePage = (event) => {
     let targetPage = parseInt(event.target.value);
     if (this.state.search) {
       this.searchData(targetPage);
     } else {
-      this.findAllCategories(targetPage);
+      this.findAllEncheres(targetPage);
     }
     this.setState({
       [event.target.name]: targetPage,
@@ -111,7 +92,7 @@ class CategorieList extends Component {
       if (this.state.search) {
         this.searchData(firstPage);
       } else {
-        this.findAllCategories(firstPage);
+        this.findAllEncheres(firstPage);
       }
     }
   };
@@ -122,20 +103,20 @@ class CategorieList extends Component {
       if (this.state.search) {
         this.searchData(this.state.currentPage - prevPage);
       } else {
-        this.findAllCategories(this.state.currentPage - prevPage);
+        this.findAllEncheres(this.state.currentPage - prevPage);
       }
     }
   };
 
   lastPage = () => {
     let condition = Math.ceil(
-      this.state.totalElements / this.state.categoriesPerPage
+      this.state.totalElements / this.state.encheresPerPage
     );
     if (this.state.currentPage < condition) {
       if (this.state.search) {
         this.searchData(condition);
       } else {
-        this.findAllCategories(condition);
+        this.findAllEncheres(condition);
       }
     }
   };
@@ -143,12 +124,12 @@ class CategorieList extends Component {
   nextPage = () => {
     if (
       this.state.currentPage <
-      Math.ceil(this.state.totalElements / this.state.categoriesPerPage)
+      Math.ceil(this.state.totalElements / this.state.encheresPerPage)
     ) {
       if (this.state.search) {
         this.searchData(this.state.currentPage + 1);
       } else {
-        this.findAllCategories(this.state.currentPage + 1);
+        this.findAllEncheres(this.state.currentPage + 1);
       }
     }
   };
@@ -161,24 +142,24 @@ class CategorieList extends Component {
 
   cancelSearch = () => {
     this.setState({ search: "" });
-    this.findAllCategories(this.state.currentPage);
+    this.findAllEncheres(this.state.currentPage);
   };
 
   searchData = (currentPage) => {
     currentPage -= 1;
     axios
       .get(
-        "https://auctionsale-cloud-webservice-production.up.railway.app/categories/search/" +
+        "http://localhost:8080/encheres/search/" +
           this.state.search +
           "?page=" +
           currentPage +
           "&size=" +
-          this.state.categoriesPerPage
+          this.state.encheresPerPage
       )
       .then((response) => response.data)
       .then((data) => {
         this.setState({
-          categories: data.content,
+          encheres: data.content,
           totalPages: data.totalPages,
           totalElements: data.totalElements,
           currentPage: data.number + 1,
@@ -187,21 +168,16 @@ class CategorieList extends Component {
   };
 
   render() {
-    const { categories, currentPage, totalPages, search } = this.state;
+    const { encheres, currentPage, totalPages, search } = this.state;
 
     return (
       <div>
         <div style={{ display: this.state.show ? "block" : "none" }}>
-          <MyToast
-            show={this.state.show}
-            message={"Categorie Deleted Successfully."}
-            type={"danger"}
-          />
         </div>
         <Card className={"border border-dark bg-dark text-white"}>
           <Card.Header>
             <div style={{ float: "left" }}>
-              <FontAwesomeIcon icon={faList} /> Categorie List
+              <FontAwesomeIcon icon={faList} />
             </div>
             <div style={{ float: "right" }}>
               <InputGroup size="sm">
@@ -237,8 +213,12 @@ class CategorieList extends Component {
             <Table bordered hover striped variant="dark">
               <thead>
                 <tr>
+                  <th>Propriétaire</th>
+                  <th>Date début</th>
+                  <th>Description</th>
+                  <th>Catégorie</th>
                   <th onClick={this.sortData}>
-                    Name{" "}
+                    Prix minimal{" "}
                     <div
                       className={
                         this.state.sortDir === "asc"
@@ -249,42 +229,32 @@ class CategorieList extends Component {
                       {" "}
                     </div>
                   </th>
-                  <th>Actions</th>
+                  <th>Date fin</th>
+                  <th>Statut</th>
                 </tr>
               </thead>
               <tbody>
-                {categories.length === 0 ? (
+                {encheres.length === 0 ? (
                   <tr align="center">
-                    <td colSpan="7">No Categories Available.</td>
+                    <td colSpan="7">Aucunes enchères.</td>
                   </tr>
                 ) : (
-                  categories.map((categorie) => (
-                    <tr key={categorie.id}>
-                      <td>{categorie.name}</td>
-                      <td>
-                        <ButtonGroup>
-                          <Link
-                            to={"edit/" + categorie.id}
-                            className="btn btn-sm btn-outline-primary"
-                          >
-                            <FontAwesomeIcon icon={faEdit} />
-                          </Link>{" "}
-                          <Button
-                            size="sm"
-                            variant="outline-danger"
-                            onClick={() => this.deleteCategorie(categorie.id)}
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </Button>
-                        </ButtonGroup>
-                      </td>
+                  encheres.map((enchere) => (
+                    <tr key={enchere.id}>
+                      <td>{enchere.user.name}</td>
+                      <td>{enchere.datedebut}</td>
+                      <td>{enchere.description}</td>
+                      <td>{enchere.categorie.name}</td>
+                      <td>{enchere.prixdepart} Ar</td>
+                      <td>{enchere.datefin}</td>
+                      <td>{enchere.statut}</td>
                     </tr>
                   ))
                 )}
               </tbody>
             </Table>
           </Card.Body>
-          {categories.length > 0 ? (
+          {encheres.length > 0 ? (
             <Card.Footer>
               <div style={{ float: "left" }}>
                 Showing Page {currentPage} of {totalPages}
@@ -345,14 +315,8 @@ class CategorieList extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    categorieObject: state.categorie,
+    enchereObject: state.enchere,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    deleteCategorie: (categorieId) => dispatch(deleteCategorie(categorieId)),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(CategorieList);
+export default connect(mapStateToProps)(EnchereList);

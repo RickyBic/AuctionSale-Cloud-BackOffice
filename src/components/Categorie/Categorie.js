@@ -3,169 +3,327 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import {
   saveCategorie,
-  fetchCategorie,
-  updateCategorie,
+  deleteCategorie,
 } from "../../services/index";
 
-import { Card, Form, Button, Col } from "react-bootstrap";
+import { Card, Table, ButtonGroup, InputGroup, FormControl, Form, Button, Col } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSave,
   faPlusSquare,
   faUndo,
-  faList,
-  faEdit,
+  faTrash,
+  faStepBackward,
+  faFastBackward,
+  faStepForward,
+  faFastForward,
 } from "@fortawesome/free-solid-svg-icons";
 import MyToast from "../MyToast";
+import axios from "axios";
 
 class Categorie extends Component {
   constructor(props) {
     super(props);
-    this.state = this.initialState;
     this.state = {
+      name: "",
       show: false,
+      message: "",
+      type: "",
+      categories: [],
+      currentPage: 1,
+      categoriesPerPage: 5,
+      sortDir: "asc",
     };
   }
 
-  initialState = {
-    id: "",
-    name: "",
-  };
-
   componentDidMount() {
-    const CategorieId = +this.props.match.params.id;
-    if (CategorieId) {
-      this.findCategorieById(CategorieId);
-    }
+    this.findAllCategories(this.state.currentPage);
   }
 
-  findCategorieById = (CategorieId) => {
-    this.props.fetchCategorie(CategorieId);
+  sortData = () => {
     setTimeout(() => {
-      let Categorie = this.props.CategorieObject.Categorie;
-      if (Categorie != null) {
-        this.setState({
-          id: Categorie.id,
-          name: Categorie.name,
-        });
-      }
-    }, 1000);
+      this.state.sortDir === "asc"
+        ? this.setState({ sortDir: "desc" })
+        : this.setState({ sortDir: "asc" });
+      this.findAllCategories(this.state.currentPage);
+    }, 500);
   };
 
-  resetCategorie = () => {
-    this.setState(() => this.initialState);
+  findAllCategories(currentPage) {
+    currentPage -= 1;
+    axios
+      .get(
+        "http://localhost:8080/categories?pageNumber=" +
+          currentPage +
+          "&pageSize=" +
+          this.state.categoriesPerPage +
+          "&sortBy=name&sortDir=" +
+          this.state.sortDir
+      )
+      .then((response) => response.data)
+      .then((data) => {
+        this.setState({
+          categories: data.content,
+          totalPages: data.totalPages,
+          totalElements: data.totalElements,
+          currentPage: data.number + 1,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        localStorage.removeItem("jwtToken");
+        this.props.history.push("/");
+      });
+  }
+
+  deleteCategorie = (categorieId) => {
+    this.props.deleteCategorie(categorieId);
+    setTimeout(() => {
+      if (this.props.categorieObject != null) {
+        this.setState({ show: true, message: "Catégorie supprimée.", type: "danger", method: "post" });
+        setTimeout(() => this.setState({ show: false }), 4000);
+      } else {
+        this.setState({ show: false });
+      }
+    }, 400);
+  };
+
+  changePage = (event) => {
+    let targetPage = parseInt(event.target.value);
+    if (this.state.search) {
+      this.searchData(targetPage);
+    } else {
+      this.findAllCategories(targetPage);
+    }
+    this.setState({
+      [event.target.name]: targetPage,
+    });
+  };
+
+  firstPage = () => {
+    let firstPage = 1;
+    if (this.state.currentPage > firstPage) {
+      if (this.state.search) {
+        this.searchData(firstPage);
+      } else {
+        this.findAllCategories(firstPage);
+      }
+    }
+  };
+
+  prevPage = () => {
+    let prevPage = 1;
+    if (this.state.currentPage > prevPage) {
+      if (this.state.search) {
+        this.searchData(this.state.currentPage - prevPage);
+      } else {
+        this.findAllCategories(this.state.currentPage - prevPage);
+      }
+    }
+  };
+
+  lastPage = () => {
+    let condition = Math.ceil(
+      this.state.totalElements / this.state.categoriesPerPage
+    );
+    if (this.state.currentPage < condition) {
+      if (this.state.search) {
+        this.searchData(condition);
+      } else {
+        this.findAllCategories(condition);
+      }
+    }
+  };
+
+  nextPage = () => {
+    if (
+      this.state.currentPage <
+      Math.ceil(this.state.totalElements / this.state.categoriesPerPage)
+    ) {
+      if (this.state.search) {
+        this.searchData(this.state.currentPage + 1);
+      } else {
+        this.findAllCategories(this.state.currentPage + 1);
+      }
+    }
+  };
+
+  refresh = () => {
+    this.findAllCategories(this.state.currentPage);
   };
 
   submitCategorie = (event) => {
     event.preventDefault();
 
-    const Categorie = {
+    const categorie = {
       name: this.state.name,
     };
 
-    this.props.saveCategorie(Categorie);
+    this.props.saveCategorie(categorie);
     setTimeout(() => {
-      if (this.props.CategorieObject.Categorie != null) {
-        this.setState({ show: true, method: "post" });
-        setTimeout(() => this.setState({ show: false }), 3000);
+      if (this.props.categorieObject.categorie != null) {
+        this.setState({ show: true, message: "Catégorie sauvegardée.", type: "success", method: "post" });
+        setTimeout(() => this.setState({ show: false }), 4000);
       } else {
         this.setState({ show: false });
       }
-    }, 2000);
-    this.setState(this.initialState);
+    }, 400);
+    this.findAllCategories(this.state.currentPage);
   };
 
-  updateCategorie = (event) => {
-    event.preventDefault();
-
-    const Categorie = {
-      id: this.state.id,
-      name: this.state.name,
-    };
-    this.props.updateCategorie(Categorie);
-    setTimeout(() => {
-      if (this.props.CategorieObject.Categorie != null) {
-        this.setState({ show: true, method: "put" });
-        setTimeout(() => this.setState({ show: false }), 3000);
-      } else {
-        this.setState({ show: false });
-      }
-    }, 2000);
-    this.setState(this.initialState);
-  };
-
-  CategorieChange = (event) => {
+  categorieChange = (event) => {
     this.setState({
       [event.target.name]: event.target.value,
     });
   };
 
-  CategorieList = () => {
-    return this.props.history.push("/list");
-  };
-
   render() {
-    const { name } =
-      this.state;
+    const { name, categories, currentPage, totalPages } = this.state;
 
     return (
       <div>
         <div style={{ display: this.state.show ? "block" : "none" }}>
           <MyToast
             show={this.state.show}
-            message={
-              this.state.method === "put"
-                ? "Categorie Updated Successfully."
-                : "Categorie Saved Successfully."
-            }
-            type={"success"}
+            message={this.state.message}
+            type={this.state.type}
           />
         </div>
         <Card className={"border border-dark bg-dark text-white"}>
           <Card.Header>
-            <FontAwesomeIcon icon={this.state.id ? faEdit : faPlusSquare} />{" "}
-            {this.state.id ? "Update Categorie" : "Add New Categorie"}
+            <FontAwesomeIcon icon={faPlusSquare} />{" "}
           </Card.Header>
           <Form
-            onReset={this.resetCategorie}
-            onSubmit={this.state.id ? this.updateCategorie : this.submitCategorie}
+            onSubmit={this.submitCategorie}
             id="CategorieFormId"
           >
             <Card.Body>
               <Form.Row>
                 <Form.Group as={Col} controlId="formGridName">
-                  <Form.Label>Name</Form.Label>
+                  <Form.Label>Donnez le nom de la catégorie ci-dessous :</Form.Label>
                   <Form.Control
                     required
                     autoComplete="off"
                     type="test"
                     name="name"
                     value={name}
-                    onChange={this.CategorieChange}
+                    onChange={this.categorieChange}
                     className={"bg-dark text-white"}
-                    placeholder="Enter Categorie Name"
                   />
                 </Form.Group>
               </Form.Row>
-            </Card.Body>
-            <Card.Footer style={{ textAlign: "right" }}>
               <Button size="sm" variant="success" type="submit">
                 <FontAwesomeIcon icon={faSave} />{" "}
-                {this.state.id ? "Update" : "Save"}
-              </Button>{" "}
-              <Button size="sm" variant="info" type="reset">
-                <FontAwesomeIcon icon={faUndo} /> Reset
+                Ajouter
               </Button>{" "}
               <Button
                 size="sm"
                 variant="info"
                 type="button"
-                onClick={() => this.CategorieList()}
-              >
-                <FontAwesomeIcon icon={faList} /> Categorie List
+                onClick={() => this.refresh()}
+                >
+              <FontAwesomeIcon icon={faUndo} /> Rafraîchir
               </Button>
-            </Card.Footer>
+            </Card.Body>
           </Form>
+          <Card.Body>
+            <Table bordered hover striped variant="dark">
+              <thead>
+                <tr>
+                  <th onClick={this.sortData}>
+                    Liste des catégories{" "}
+                    <div
+                      className={
+                        this.state.sortDir === "asc"
+                          ? "arrow arrow-up"
+                          : "arrow arrow-down"
+                      }
+                    >
+                      {" "}
+                    </div>
+                  </th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {categories.length === 0 ? (
+                  <tr align="center">
+                    <td colSpan="7">Aucunes catégories.</td>
+                  </tr>
+                ) : (
+                  categories.map((categorie) => (
+                    <tr key={categorie.id}>
+                      <td>{categorie.name}</td>
+                      <td>
+                        <ButtonGroup>
+                          <Button
+                            size="sm"
+                            variant="outline-danger"
+                            onClick={() => this.deleteCategorie(categorie.id)}
+                          >
+                            <FontAwesomeIcon icon={faTrash} />
+                          </Button>
+                        </ButtonGroup>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </Table>
+          </Card.Body>
+          {categories.length > 0 ? (
+            <Card.Footer>
+              <div style={{ float: "left" }}>
+                Showing Page {currentPage} of {totalPages}
+              </div>
+              <div style={{ float: "right" }}>
+                <InputGroup size="sm">
+                  <InputGroup.Prepend>
+                    <Button
+                      type="button"
+                      variant="outline-info"
+                      disabled={currentPage === 1 ? true : false}
+                      onClick={this.firstPage}
+                    >
+                      <FontAwesomeIcon icon={faFastBackward} /> First
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline-info"
+                      disabled={currentPage === 1 ? true : false}
+                      onClick={this.prevPage}
+                    >
+                      <FontAwesomeIcon icon={faStepBackward} /> Prev
+                    </Button>
+                  </InputGroup.Prepend>
+                  <FormControl
+                    className={"page-num bg-dark"}
+                    name="currentPage"
+                    value={currentPage}
+                    onChange={this.changePage}
+                  />
+                  <InputGroup.Append>
+                    <Button
+                      type="button"
+                      variant="outline-info"
+                      disabled={currentPage === totalPages ? true : false}
+                      onClick={this.nextPage}
+                    >
+                      <FontAwesomeIcon icon={faStepForward} /> Next
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline-info"
+                      disabled={currentPage === totalPages ? true : false}
+                      onClick={this.lastPage}
+                    >
+                      <FontAwesomeIcon icon={faFastForward} /> Last
+                    </Button>
+                  </InputGroup.Append>
+                </InputGroup>
+              </div>
+            </Card.Footer>
+          ) : null}
         </Card>
       </div>
     );
@@ -174,15 +332,14 @@ class Categorie extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    CategorieObject: state.Categorie,
+    categorieObject: state.categorie,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    saveCategorie: (Categorie) => dispatch(saveCategorie(Categorie)),
-    fetchCategorie: (CategorieId) => dispatch(fetchCategorie(CategorieId)),
-    updateCategorie: (Categorie) => dispatch(updateCategorie(Categorie)),
+    saveCategorie: (categorie) => dispatch(saveCategorie(categorie)),
+    deleteCategorie: (categorieId) => dispatch(deleteCategorie(categorieId)),
   };
 };
 

@@ -19,14 +19,20 @@ const NavigationBar = () => {
   const userLinks = (
     <>
       <Nav className="mr-auto">
-        <Link to={"add"} className="nav-link">
-          Add Categorie
+        <Link to={"/categories"} className="nav-link">
+          Ajouter catégorie
         </Link>
-        <Link to={"list"} className="nav-link">
-          Categorie List
+        <Link to={"/encheres"} className="nav-link">
+          Liste enchères
         </Link>
-        <Link to={"users"} className="nav-link">
-          User List
+        <Link to={"/users"} className="nav-link">
+          Liste utilisateurs
+        </Link>
+        <Link to={"/home"} className="nav-link">
+          Liste demandes
+        </Link>
+        <Link to={"/home"} className="nav-link">
+          Statistiques
         </Link>
       </Nav>
       <Nav className="navbar-right">

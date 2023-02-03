@@ -7,39 +7,7 @@ export const saveCategorie = (categorie) => {
       type: CT.SAVE_CATEGORIE_REQUEST,
     });
     axios
-      .post("https://auctionsale-cloud-webservice-production.up.railway.app/categories", categorie)
-      .then((response) => {
-        dispatch(categorieSuccess(response.data));
-      })
-      .catch((error) => {
-        dispatch(categorieFailure(error));
-      });
-  };
-};
-
-export const fetchCategorie = (categorieId) => {
-  return (dispatch) => {
-    dispatch({
-      type: CT.FETCH_CATEGORIE_REQUEST,
-    });
-    axios
-      .get("https://auctionsale-cloud-webservice-production.up.railway.app/categories/" + categorieId)
-      .then((response) => {
-        dispatch(categorieSuccess(response.data));
-      })
-      .catch((error) => {
-        dispatch(categorieFailure(error));
-      });
-  };
-};
-
-export const updateCategorie = (categorie) => {
-  return (dispatch) => {
-    dispatch({
-      type: CT.UPDATE_CATEGORIE_REQUEST,
-    });
-    axios
-      .put("https://auctionsale-cloud-webservice-production.up.railway.app/categories", categorie)
+      .post("http://localhost:8080/categories", categorie)
       .then((response) => {
         dispatch(categorieSuccess(response.data));
       })
@@ -55,7 +23,7 @@ export const deleteCategorie = (categorieId) => {
       type: CT.DELETE_CATEGORIE_REQUEST,
     });
     axios
-      .delete("https://auctionsale-cloud-webservice-production.up.railway.app/categories/" + categorieId)
+      .delete("http://localhost:8080/categories/" + categorieId)
       .then((response) => {
         dispatch(categorieSuccess(response.data));
       })

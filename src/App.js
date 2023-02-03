@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
 import NavigationBar from "./components/NavigationBar";
 import Categorie from "./components/Categorie/Categorie";
-import CategorieList from "./components/Categorie/CategorieList";
+import EnchereList from "./components/Enchere/EnchereList";
 import UserList from "./components/User/UserList";
 import Login from "./components/User/Login";
 import Footer from "./components/Footer";
@@ -31,17 +31,10 @@ const App = () => {
             <Switch>
               <Route path="/" exact component={Login} />
               <Route path="/home" exact component={Home} />
-              <Route path="/add" exact component={Categorie} />
-              <Route path="/edit/:id" exact component={Categorie} />
-              <Route path="/list" exact component={CategorieList} />
+              <Route path="/categories" exact component={Categorie} />
+              <Route path="/encheres" exact component={EnchereList} />
               <Route path="/users" exact component={UserList} />
-              <Route
-                path="/logout"
-                exact
-                component={() => (
-                  <Login message="User Logged Out Successfully." />
-                )}
-              />
+              <Route path="/logout" exact component={Login} />
             </Switch>
           </Col>
         </Row>

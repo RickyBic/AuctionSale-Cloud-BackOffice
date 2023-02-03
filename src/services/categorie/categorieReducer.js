@@ -8,8 +8,6 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case CT.SAVE_CATEGORIE_REQUEST:
-    case CT.FETCH_CATEGORIE_REQUEST:
-    case CT.UPDATE_CATEGORIE_REQUEST:
     case CT.DELETE_CATEGORIE_REQUEST:
       return {
         ...state,
