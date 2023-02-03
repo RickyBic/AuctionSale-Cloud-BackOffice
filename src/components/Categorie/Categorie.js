@@ -85,7 +85,7 @@ class Categorie extends Component {
       } else {
         this.setState({ show: false });
       }
-    }, 400);
+    }, 2000);
   };
 
   changePage = (event) => {
@@ -167,7 +167,7 @@ class Categorie extends Component {
       } else {
         this.setState({ show: false });
       }
-    }, 400);
+    }, 2000);
     this.findAllCategories(this.state.currentPage);
   };
 
